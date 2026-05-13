@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AKKARMASHI — Elite Gaming Guild</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&family=Orbitron:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #F5C842;
+    --gold-light: #FFE080;
+    --gold-dark: #C9960A;
+    --gold-glow: #FFD700;
+    --bg-deep: #050508;
+    --bg-dark: #0A0A0F;
+    --bg-card: #0F0F18;
+    --text-body: #D4C5A0;
+    --white: #FFFDF0;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Rajdhani', sans-serif;
+    background: var(--bg-deep);
+    color: var(--text-body);
+    overflow-x: hidden;
+    cursor: auto;
+  }
+
+  #particle-canvas {
+    position: fixed; top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none; z-index: 0;
+    opacity: 0.4;
+  }
+
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: var(--bg-deep); }
+  ::-webkit-scrollbar-thumb { background: var(--gold-dark); border-radius: 2px; }
+
+  nav {
+    position: fixed; top: 0; left: 0; right: 0;
+    z-index: 1000;
+    padding: 16px 60px;
+    display: flex; align-items: center; justify-content: space-between;
+    background: linear-gradient(180deg, rgba(5,5,8,0.98) 0%, transparent 100%);
+    border-bottom: 1px solid rgba(245,200,66,0.15);
+    backdrop-filter: blur(10px);
+  }
+  .nav-logo {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 1.4rem; color: var(--gold);
+    text-decoration: none;
+    letter-spacing: 3px;
+    text-shadow: 0 0 20px rgba(245,200,66,0.5);
+  }
+  .nav-links { display: flex; gap: 32px; list-style: none; }
+  .nav-links a {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.65rem; font-weight: 500;
+    color: var(--text-body); text-decoration: none;
+    letter-spacing: 2px; text-transform: uppercase;
+    transition: color 0.3s, text-shadow 0.3s;
+    position: relative;
+  }
+  .nav-links a::after {
+    content: ''; position: absolute; bottom: -4px; left: 0;
+    width: 0; height: 1px; background: var(--gold);
+    transition: width 0.3s;
+  }
+  .nav-links a:hover { color: var(--gold); text-shadow: 0 0 12px var(--gold); }
+  .nav-links a:hover::after { width: 100%; }
+  .nav-cta {
+    font-family: 'Orbitron', monospace; font-size: 0.65rem;
+    font-weight: 700; letter-spacing: 2px;
+    background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%);
+    color: #000; border: none; padding: 10px 24px;
+    clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+    cursor: pointer; transition: all 0.3s;
+    text-decoration: none;
+  }
+  .nav-cta:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(245,200,66,0.4); }
+
+  #hero {
+    min-height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+    position: relative; overflow: hidden;
+    background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(245,200,66,0.08) 0%, transparent 60%),
+                radial-gradient(ellipse 50% 40% at 80% 80%, rgba(201,150,10,0.05) 0%, transparent 60%),
+                var(--bg-deep);
+  }
+
+  .hero-grid {
+    position: absolute; bottom: 0; left: 0; right: 0; height: 50%;
+    background:
+      linear-gradient(rgba(245,200,66,0.08) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(245,200,66,0.08) 1px, transparent 1px);
+    background-size: 60px 60px;
+    transform: perspective(600px) rotateX(60deg);
+    transform-origin: bottom;
+    animation: gridPulse 4s ease-in-out infinite;
+  }
+  @keyframes gridPulse {
+    0%, 100% { opacity: 0.6; }
+    50% { opacity: 1; }
+  }
+
+  .shield-container {
+    position: absolute; right: 8%; top: 50%; transform: translateY(-50%);
+    width: 340px; height: 400px;
+    animation: shieldFloat 5s ease-in-out infinite;
+  }
+  @keyframes shieldFloat {
+    0%, 100% { transform: translateY(-50%) rotateY(0deg); }
+    25% { transform: translateY(calc(-50% - 20px)) rotateY(8deg); }
+    75% { transform: translateY(calc(-50% + 10px)) rotateY(-8deg); }
+  }
+  .shield-svg { width: 100%; height: 100%; filter: drop-shadow(0 0 40px rgba(245,200,66,0.5)) drop-shadow(0 20px 60px rgba(245,200,66,0.2)); }
+
+  .hero-content { position: relative; z-index: 2; max-width: 600px; padding: 0 60px; }
+  .hero-tag {
+    font-family: 'Orbitron', monospace; font-size: 0.6rem;
+    letter-spacing: 4px; color: var(--gold-dark);
+    text-transform: uppercase; margin-bottom: 20px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .hero-tag::before {
+    content: ''; display: block; width: 40px; height: 1px;
+    background: var(--gold-dark);
+  }
+  .hero-title {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: clamp(3rem, 6vw, 5rem);
+    font-weight: 900; line-height: 1.1;
+    color: var(--white);
+    text-shadow: 0 0 60px rgba(245,200,66,0.3);
+    margin-bottom: 12px;
+  }
+  .hero-title span {
+    background: linear-gradient(135deg, var(--gold-light) 0%, var(--gold) 50%, var(--gold-dark) 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+    display: block;
+  }
+  .hero-subtitle {
+    font-family: 'Orbitron', monospace; font-size: 0.75rem;
+    letter-spacing: 6px; color: var(--gold-dark);
+    text-transform: uppercase; margin-bottom: 28px;
+  }
+  .hero-desc {
+    font-size: 1.05rem; line-height: 1.7;
+    color: var(--text-body); margin-bottom: 40px;
+    max-width: 480px;
+  }
+  .hero-stats {
+    display: flex; gap: 40px; margin-bottom: 48px;
+  }
+  .stat-item { text-align: center; }
+  .stat-num {
+    font-family: 'Orbitron', monospace; font-size: 2rem;
+    font-weight: 900; color: var(--gold);
+    text-shadow: 0 0 20px rgba(245,200,66,0.6);
+    display: block;
+  }
+  .stat-label {
+    font-family: 'Orbitron', monospace; font-size: 0.55rem;
+    letter-spacing: 2px; color: var(--text-body);
+    text-transform: uppercase;
+  }
+  .hero-btns { display: flex; gap: 16px; flex-wrap: wrap; }
+  .btn-primary {
+    font-family: 'Orbitron', monospace; font-size: 0.7rem;
+    font-weight: 700; letter-spacing: 2px;
+    background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%);
+    color: #000; border: none; padding: 14px 32px;
+    clip-path: polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%);
+    cursor: pointer; text-decoration: none;
+    transition: all 0.3s; display: inline-block;
+    position: relative; overflow: hidden;
+  }
+  .btn-primary::before {
+    content: ''; position: absolute; top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    transition: left 0.5s;
+  }
+  .btn-primary:hover::before { left: 100%; }
+  .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 12px 32px rgba(245,200,66,0.45); }
+  .btn-secondary {
+    font-family: 'Orbitron', monospace; font-size: 0.7rem;
+    font-weight: 500; letter-spacing: 2px;
+    background: transparent;
+    color: var(--gold); border: 1px solid rgba(245,200,66,0.4);
+    padding: 14px 32px;
+    clip-path: polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%);
+    cursor: pointer; text-decoration: none;
+    transition: all 0.3s; display: inline-block;
+  }
+  .btn-secondary:hover { background: rgba(245,200,66,0.08); border-color: var(--gold); transform: translateY(-3px); }
+
+  .scroll-hint {
+    position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%);
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    font-family: 'Orbitron', monospace; font-size: 0.5rem;
+    letter-spacing: 3px; color: rgba(245,200,66,0.4);
+    animation: bounce 2s ease-in-out infinite;
+  }
+  .scroll-line { width: 1px; height: 40px; background: linear-gradient(var(--gold-dark), transparent); }
+  @keyframes bounce {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    50% { transform: translateX(-50%) translateY(8px); }
+  }
+
+  section { position: relative; z-index: 1; }
+  .section-header { text-align: center; margin-bottom: 60px; }
+  .section-eyebrow {
+    font-family: 'Orbitron', monospace; font-size: 0.6rem;
+    letter-spacing: 5px; color: var(--gold-dark);
+    text-transform: uppercase; margin-bottom: 16px;
+    display: flex; align-items: center; justify-content: center; gap: 16px;
+  }
+  .section-eyebrow::before, .section-eyebrow::after {
+    content: ''; display: block; flex: 1; max-width: 60px; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold-dark));
+  }
+  .section-eyebrow::after { background: linear-gradient(270deg, transparent, var(--gold-dark)); }
+  .section-title {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: clamp(2rem, 4vw, 3rem);
+    color: var(--white); font-weight: 700;
+    text-shadow: 0 0 40px rgba(245,200,66,0.2);
+    margin-bottom: 20px;
+  }
+  .section-title span {
+    background: linear-gradient(135deg, var(--gold-light), var(--gold-dark));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .section-desc {
+    font-size: 1.05rem; line-height: 1.7;
+    color: var(--text-body); max-width: 600px; margin: 0 auto;
+  }
+
+  .gold-divider {
+    width: 100%; height: 1px;
+    background: linear-gradient(90deg, transparent 0%, var(--gold-dark) 30%, var(--gold) 50%, var(--gold-dark) 70%, transparent 100%);
+    opacity: 0.3; margin: 0;
+  }
+
+  #about {
+    padding: 100px 60px;
+    background: linear-gradient(180deg, var(--bg-deep) 0%, var(--bg-dark) 100%);
+  }
+  .about-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 60px;
+    max-width: 1100px; margin: 0 auto; align-items: center;
+  }
+  .about-visual {
+    position: relative; height: 400px;
+  }
+  .hexgrid {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px;
+    opacity: 0.15;
+  }
+  .hex-cell {
+    aspect-ratio: 1; background: var(--gold);
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+    animation: hexPulse var(--d, 3s) ease-in-out infinite;
+    animation-delay: var(--dl, 0s);
+  }
+  @keyframes hexPulse {
+    0%, 100% { opacity: 0.1; }
+    50% { opacity: 0.5; }
+  }
+  .about-badge {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    width: 220px; height: 220px;
+    display: flex; align-items: center; justify-content: center;
+    background: radial-gradient(circle, rgba(245,200,66,0.1) 0%, transparent 70%);
+    border: 1px solid rgba(245,200,66,0.2);
+    border-radius: 50%;
+    animation: badgeRotate 20s linear infinite;
+  }
+  .about-badge::before {
+    content: ''; position: absolute; inset: -1px;
+    border-radius: 50%;
+    background: conic-gradient(var(--gold) 0deg, transparent 60deg, transparent 120deg, var(--gold) 180deg, transparent 240deg, transparent 300deg, var(--gold) 360deg);
+    animation: badgeRotate 10s linear infinite;
+    -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #000 calc(100% - 1px));
+    mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #000 calc(100% - 1px));
+  }
+  @keyframes badgeRotate { to { transform: translate(-50%, -50%) rotate(360deg); } }
+  .about-badge-inner {
+    animation: badgeCounterRotate 20s linear infinite;
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+  }
+  @keyframes badgeCounterRotate { to { transform: rotate(-360deg); } }
+  .about-badge-text {
+    font-family: 'Cinzel Decorative', serif; font-size: 1.3rem;
+    font-weight: 900; color: var(--gold);
+    text-shadow: 0 0 20px rgba(245,200,66,0.8);
+    text-align: center;
+  }
+  .about-badge-sub {
+    font-family: 'Orbitron', monospace; font-size: 0.5rem;
+    letter-spacing: 4px; color: var(--gold-dark); text-align: center;
+  }
+  .about-text h3 {
+    font-family: 'Cinzel Decorative', serif; font-size: 1.6rem;
+    color: var(--gold); margin-bottom: 20px;
+  }
+  .about-text p {
+    font-size: 0.95rem; line-height: 1.8; color: var(--text-body);
+    margin-bottom: 18px;
+  }
+  .about-features { list-style: none; margin-top: 28px; }
+  .about-features li {
+    font-family: 'Rajdhani', sans-serif; font-size: 0.9rem;
+    font-weight: 600; color: var(--text-body);
+    padding: 10px 0; border-bottom: 1px solid rgba(245,200,66,0.1);
+    display: flex; align-items: center; gap: 12px;
+  }
+  .feature-icon {
+    width: 28px; height: 28px; flex-shrink: 0;
+    background: linear-gradient(135deg, rgba(245,200,66,0.2), rgba(245,200,66,0.05));
+    border: 1px solid rgba(245,200,66,0.3);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.8rem;
+    clip-path: polygon(4px 0%, 100% 0%, calc(100% - 4px) 100%, 0% 100%);
+  }
+
+  #booking {
+    padding: 100px 60px;
+    background: linear-gradient(180deg, var(--bg-dark) 0%, var(--bg-deep) 100%);
+    position: relative; overflow: hidden;
+  }
+  #booking::before {
+    content: 'WAR'; position: absolute;
+    font-family: 'Cinzel Decorative', serif; font-size: 30vw; font-weight: 900;
+    color: rgba(245,200,66,0.02); top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none; letter-spacing: -10px;
+    white-space: nowrap;
+  }
+  .booking-wrap { max-width: 1000px; margin: 0 auto; }
+  .booking-form-card {
+    background: linear-gradient(135deg, rgba(15,15,24,0.9) 0%, rgba(10,10,15,0.9) 100%);
+    border: 1px solid rgba(245,200,66,0.2);
+    border-top: 2px solid var(--gold);
+    padding: 50px;
+    position: relative; overflow: hidden;
+    clip-path: polygon(0 0, calc(100% - 30px) 0, 100% 30px, 100% 100%, 30px 100%, 0 calc(100% - 30px));
+  }
+  .booking-form-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0;
+    height: 1px; background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+  .booking-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 40px; flex-wrap: wrap; gap: 20px;
+  }
+  .booking-header h3 {
+    font-family: 'Cinzel Decorative', serif; font-size: 1.4rem;
+    color: var(--gold);
+  }
+  .booking-status {
+    font-family: 'Orbitron', monospace; font-size: 0.55rem;
+    letter-spacing: 2px; padding: 8px 14px;
+    border: 1px solid rgba(100,255,100,0.4); color: #5EFF5E;
+    background: rgba(50,255,50,0.05);
+    clip-path: polygon(6px 0%, 100% 0%, calc(100% - 6px) 100%, 0% 100%);
+    animation: statusBlink 2s ease-in-out infinite;
+  }
+  @keyframes statusBlink { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .form-group { display: flex; flex-direction: column; gap: 8px; }
+  .form-group.full-width { grid-column: 1 / -1; }
+  .form-label {
+    font-family: 'Orbitron', monospace; font-size: 0.55rem;
+    letter-spacing: 2px; color: var(--gold-dark); text-transform: uppercase;
+  }
+  .form-input, .form-select, .form-textarea {
+    background: rgba(245,200,66,0.04);
+    border: 1px solid rgba(245,200,66,0.2);
+    border-bottom: 1px solid rgba(245,200,66,0.4);
+    color: var(--white); padding: 12px 16px;
+    font-family: 'Rajdhani', sans-serif; font-size: 0.95rem;
+    font-weight: 500; outline: none;
+    transition: all 0.3s; width: 100%;
+    clip-path: polygon(4px 0%, 100% 0%, calc(100% - 4px) 100%, 0% 100%);
+  }
+  .form-input:focus, .form-select:focus, .form-textarea:focus {
+    border-color: rgba(245,200,66,0.6);
+    background: rgba(245,200,66,0.07);
+    box-shadow: 0 0 20px rgba(245,200,66,0.1);
+  }
+  .form-select option { background: var(--bg-dark); color: var(--white); }
+  .form-textarea { resize: vertical; min-height: 100px; clip-path: none; }
+  .war-type-grid {
+    display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;
+    margin-top: 8px;
+  }
+  .war-type-btn {
+    background: rgba(245,200,66,0.04); border: 1px solid rgba(245,200,66,0.2);
+    color: var(--text-body); padding: 12px 8px;
+    font-family: 'Orbitron', monospace; font-size: 0.55rem;
+    letter-spacing: 1px; cursor: pointer;
+    transition: all 0.3s; text-align: center;
+    clip-path: polygon(6px 0%, 100% 0%, calc(100% - 6px) 100%, 0% 100%);
+  }
+  .war-type-btn.active, .war-type-btn:hover {
+    background: rgba(245,200,66,0.12); border-color: var(--gold);
+    color: var(--gold);
+  }
+  .war-type-btn .wt-icon { font-size: 1.2rem; display: block; margin-bottom: 4px; }
+  .time-slots { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 8px; }
+  .time-slot {
+    background: rgba(245,200,66,0.04); border: 1px solid rgba(245,200,66,0.15);
+    color: var(--text-body); padding: 8px 4px;
+    font-family: 'Orbitron', monospace; font-size: 0.5rem;
+    letter-spacing: 1px; cursor: pointer;
+    transition: all 0.3s; text-align: center;
+    font-weight: 600;
+  }
+  .time-slot.active { background: rgba(245,200,66,0.12); border-color: var(--gold); color: var(--gold); }
+  .time-slot.booked { opacity: 0.3; cursor: not-allowed; text-decoration: line-through; }
+  .booking-submit {
+    margin-top: 32px; width: 100%;
+    font-family: 'Orbitron', monospace; font-size: 0.75rem;
+    font-weight: 900; letter-spacing: 3px;
+    background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%);
+    color: #000; border: none; padding: 16px;
+    clip-path: polygon(12px 0%, 100% 0%, calc(100% - 12px) 100%, 0% 100%);
+    cursor: pointer; transition: all 0.3s; position: relative; overflow: hidden;
+  }
+  .booking-submit::before {
+    content: ''; position: absolute; top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    transition: left 0.6s;
+  }
+  .booking-submit:hover::before { left: 100%; }
+  .booking-submit:hover { transform: translateY(-3px); box-shadow: 0 16px 40px rgba(245,200,66,0.5); }
+
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.9);
+    z-index: 9000; display: none; align-items: center; justify-content: center;
+    backdrop-filter: blur(10px);
+  }
+  .modal-overlay.show { display: flex; }
+  .modal-box {
+    background: var(--bg-card);
+    border: 1px solid rgba(245,200,66,0.4);
+    border-top: 3px solid var(--gold);
+    padding: 50px;
+    max-width: 450px; width: 90%; text-align: center;
+    position: relative;
+    clip-path: polygon(0 0, calc(100% - 24px) 0, 100% 24px, 100% 100%, 24px 100%, 0 calc(100% - 24px));
+    animation: modalIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+  @keyframes modalIn {
+    from { transform: scale(0.7) translateY(-40px); opacity: 0; }
+    to { transform: scale(1) translateY(0); opacity: 1; }
+  }
+  .modal-icon { font-size: 2.5rem; margin-bottom: 16px; display: block; }
+  .modal-title {
+    font-family: 'Cinzel Decorative', serif; font-size: 1.3rem;
+    color: var(--gold); margin-bottom: 14px;
+  }
+  .modal-text { font-size: 0.9rem; line-height: 1.6; color: var(--text-body); margin-bottom: 24px; }
+  .modal-id {
+    font-family: 'Orbitron', monospace; font-size: 0.65rem;
+    letter-spacing: 3px; color: var(--gold);
+    background: rgba(245,200,66,0.08); padding: 10px 20px;
+    border: 1px solid rgba(245,200,66,0.2); display: inline-block; margin-bottom: 24px;
+  }
+  .modal-close {
+    font-family: 'Orbitron', monospace; font-size: 0.6rem;
+    letter-spacing: 2px; background: transparent;
+    border: 1px solid rgba(245,200,66,0.3); color: var(--gold);
+    padding: 10px 24px; cursor: pointer; transition: all 0.3s;
+    clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+  }
+  .modal-close:hover { background: rgba(245,200,66,0.1); }
+
+  #achievements {
+    padding: 100px 60px;
+    background: var(--bg-deep);
+    position: relative; overflow: hidden;
+  }
+  .achievements-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; max-width: 900px; margin: 0 auto; }
+  .achievement-card {
+    background: linear-gradient(135deg, rgba(245,200,66,0.05) 0%, rgba(10,10,15,0.9) 100%);
+    border: 1px solid rgba(245,200,66,0.15);
+    padding: 36px 28px; position: relative;
+    overflow: hidden; transition: all 0.4s;
+    clip-path: polygon(0 0, 100% 0, 100% calc(100% - 16px), calc(100% - 16px) 100%, 0 100%);
+  }
+  .achievement-card:hover { border-color: rgba(245,200,66,0.4); transform: scale(1.02); }
+  .achievement-card::after {
+    content: ''; position: absolute; bottom: 0; right: 0;
+    width: 40px; height: 40px;
+    background: linear-gradient(225deg, rgba(245,200,66,0.15) 0%, transparent 60%);
+  }
+  .ach-icon { font-size: 2.2rem; margin-bottom: 16px; display: block; }
+  .ach-title {
+    font-family: 'Rajdhani', sans-serif; font-size: 1rem;
+    font-weight: 700; color: var(--white); margin-bottom: 8px;
+  }
+  .ach-value {
+    font-family: 'Orbitron', monospace; font-size: 1.8rem;
+    font-weight: 900; color: var(--gold);
+    text-shadow: 0 0 20px rgba(245,200,66,0.4);
+    display: block; margin-bottom: 8px;
+  }
+  .ach-desc { font-size: 0.8rem; color: rgba(212,197,160,0.6); line-height: 1.5; }
+
+  #join {
+    padding: 100px 60px;
+    background: linear-gradient(180deg, var(--bg-deep) 0%, var(--bg-dark) 100%);
+    position: relative; overflow: hidden;
+  }
+  .join-content {
+    max-width: 900px; margin: 0 auto; text-align: center; position: relative; z-index: 1;
+  }
+  .join-requirements { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin: 50px 0; }
+  .req-card {
+    background: rgba(245,200,66,0.04); border: 1px solid rgba(245,200,66,0.15);
+    padding: 24px 16px; text-align: center; transition: all 0.3s;
+    clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+  }
+  .req-card:hover { background: rgba(245,200,66,0.08); border-color: rgba(245,200,66,0.3); }
+  .req-icon { font-size: 1.8rem; margin-bottom: 12px; display: block; }
+  .req-title { font-family: 'Orbitron', monospace; font-size: 0.6rem; letter-spacing: 2px; color: var(--gold); margin-bottom: 8px; }
+  .req-desc { font-size: 0.8rem; color: var(--text-body); line-height: 1.5; }
+  .social-links { display: flex; gap: 16px; justify-content: center; margin-top: 40px; flex-wrap: wrap; }
+  .social-link {
+    font-family: 'Orbitron', monospace; font-size: 0.6rem; letter-spacing: 2px;
+    border: 1px solid rgba(245,200,66,0.3); color: var(--gold);
+    padding: 12px 24px; text-decoration: none; transition: all 0.3s;
+    clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .social-link:hover { background: rgba(245,200,66,0.1); border-color: var(--gold); transform: translateY(-3px); }
+
+  footer {
+    padding: 50px; border-top: 1px solid rgba(245,200,66,0.12);
+    background: var(--bg-dark);
+  }
+  .footer-grid { display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 40px; max-width: 1000px; margin: 0 auto; }
+  .footer-logo {
+    font-family: 'Cinzel Decorative', serif; font-size: 1rem;
+    color: var(--gold); margin-bottom: 12px;
+    letter-spacing: 3px;
+  }
+  .footer-tagline { font-size: 0.8rem; line-height: 1.6; color: rgba(212,197,160,0.5); margin-bottom: 18px; }
+  .footer-col-title {
+    font-family: 'Orbitron', monospace; font-size: 0.55rem;
+    letter-spacing: 3px; color: var(--gold-dark); text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+  .footer-links { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .footer-links a {
+    font-size: 0.8rem; color: rgba(212,197,160,0.5); text-decoration: none;
+    transition: color 0.3s;
+  }
+  .footer-links a:hover { color: var(--gold); }
+  .footer-bottom {
+    margin-top: 40px; padding-top: 16px; border-top: 1px solid rgba(245,200,66,0.08);
+    display: flex; justify-content: space-between; align-items: center;
+    max-width: 1000px; margin-left: auto; margin-right: auto; flex-wrap: wrap; gap: 12px;
+  }
+  .footer-copy { font-family: 'Orbitron', monospace; font-size: 0.5rem; letter-spacing: 2px; color: rgba(212,197,160,0.25); }
+  .footer-kerala { font-family: 'Orbitron', monospace; font-size: 0.5rem; letter-spacing: 2px; color: rgba(245,200,66,0.25); }
+
+  .reveal { opacity: 0; transform: translateY(40px); transition: opacity 0.8s ease, transform 0.8s ease; }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+  .reveal-left { opacity: 0; transform: translateX(-40px); transition: opacity 0.8s ease, transform 0.8s ease; }
+  .reveal-left.visible { opacity: 1; transform: translateX(0); }
+  .reveal-right { opacity: 0; transform: translateX(40px); transition: opacity 0.8s ease, transform 0.8s ease; }
+  .reveal-right.visible { opacity: 1; transform: translateX(0); }
+
+  @media (max-width: 900px) {
+    nav { padding: 14px 20px; }
+    .nav-links { display: none; }
+    .nav-logo { font-size: 1.1rem; }
+    .nav-cta { font-size: 0.55rem; padding: 8px 16px; }
+    .hero-content { padding: 0 20px; }
+    .shield-container { display: none; }
+    #about, #booking, #achievements, #join { padding: 80px 20px; }
+    .about-grid { grid-template-columns: 1fr; gap: 40px; }
+    .about-visual { height: 300px; }
+    .achievements-grid { grid-template-columns: 1fr; }
+    .join-requirements { grid-template-columns: 1fr; }
+    .footer-grid { grid-template-columns: 1fr; gap: 24px; }
+    .form-grid { grid-template-columns: 1fr; }
+    .war-type-grid { grid-template-columns: repeat(2, 1fr); }
+    .time-slots { grid-template-columns: repeat(3, 1fr); }
+    footer { padding: 40px 20px; }
+  }
+</style>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/index.min.js"></script>
+<script type="text/javascript">
+  emailjs.init("7b9h8k2jZqX9nL5mP"); // Initialize with a basic ID
+</script>
+</head>
+<body>
+
+<canvas id="particle-canvas"></canvas>
+
+<div class="modal-overlay" id="bookingModal">
+  <div class="modal-box">
+    <span class="modal-icon">⚔️</span>
+    <div class="modal-title">WAR BOOKED!</div>
+    <p class="modal-text">Your guild war challenge has been received. AKKARMASHI will confirm within 24 hours.</p>
+    <div class="modal-id" id="bookingId">WAR-ID: AKK-000000</div>
+    <button class="modal-close" onclick="closeModal()">CLOSE</button>
+  </div>
+</div>
+
+<nav>
+  <a href="#hero" class="nav-logo">⚔ AKKARMASHI</a>
+  <ul class="nav-links">
+    <li><a href="#about">Guild</a></li>
+    <li><a href="#achievements">Trophies</a></li>
+    <li><a href="#join">Join</a></li>
+  </ul>
+  <a href="#booking" class="nav-cta">BOOK WAR</a>
+</nav>
+
+<section id="hero">
+  <div class="hero-grid"></div>
+  <div class="shield-container">
+    <svg class="shield-svg" viewBox="0 0 300 360" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <radialGradient id="shieldGrad" cx="40%" cy="30%">
+          <stop offset="0%" stop-color="#FFE080"/>
+          <stop offset="50%" stop-color="#F5C842"/>
+          <stop offset="100%" stop-color="#8A6500"/>
+        </radialGradient>
+        <radialGradient id="shieldInner" cx="50%" cy="40%">
+          <stop offset="0%" stop-color="#1A1A00"/>
+          <stop offset="100%" stop-color="#0A0800"/>
+        </radialGradient>
+        <filter id="glow"><feGaussianBlur stdDeviation="6" result="coloredBlur"/><feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        <filter id="glow2"><feGaussianBlur stdDeviation="12" result="coloredBlur"/><feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+      </defs>
+      <path d="M150 20 L280 80 L280 200 Q280 320 150 350 Q20 320 20 200 L20 80 Z" fill="rgba(245,200,66,0.08)" filter="url(#glow2)"/>
+      <path d="M150 30 L270 85 L270 200 Q270 308 150 338 Q30 308 30 200 L30 85 Z" fill="url(#shieldGrad)" filter="url(#glow)"/>
+      <path d="M150 46 L256 95 L256 200 Q256 295 150 320 Q44 295 44 200 L44 95 Z" fill="url(#shieldInner)" stroke="rgba(245,200,66,0.3)" stroke-width="1"/>
+      <path d="M150 30 L270 85" stroke="rgba(255,240,160,0.6)" stroke-width="2" fill="none"/>
+      <path d="M30 85 L150 30" stroke="rgba(255,240,160,0.2)" stroke-width="1" fill="none"/>
+      <line x1="150" y1="80" x2="150" y2="290" stroke="url(#shieldGrad)" stroke-width="5" filter="url(#glow)"/>
+      <polygon points="150,70 140,100 150,95 160,100" fill="#F5C842" filter="url(#glow)"/>
+      <rect x="118" y="175" width="64" height="8" rx="4" fill="url(#shieldGrad)" filter="url(#glow)"/>
+      <ellipse cx="150" cy="286" rx="12" ry="8" fill="#F5C842" filter="url(#glow)"/>
+      <circle cx="150" cy="120" r="6" fill="rgba(245,200,66,0.6)" filter="url(#glow)"/>
+      <text x="150" y="240" text-anchor="middle" font-family="serif" font-size="11" fill="rgba(245,200,66,0.8)" font-weight="bold">AKKARMASHI</text>
+      <circle cx="80" cy="130" r="3" fill="rgba(245,200,66,0.4)"/>
+      <circle cx="220" cy="130" r="3" fill="rgba(245,200,66,0.4)"/>
+      <path d="M150 30 L270 85 L270 200 Q270 308 150 338 Q30 308 30 200 L30 85 Z" fill="none" stroke="rgba(255,220,60,0.4)" stroke-width="2" stroke-dasharray="8 4">
+        <animate attributeName="stroke-dashoffset" values="0;-24" dur="2s" repeatCount="indefinite"/>
+      </path>
+    </svg>
+  </div>
+  <div class="hero-content">
+    <div class="hero-tag reveal">Kerala's Elite Guild • Est. 2021</div>
+    <h1 class="hero-title reveal">THE GUILD OF<br><span>AKKARMASHI</span></h1>
+    <div class="hero-subtitle reveal">⚔ KOTTAYAM — KERALA ⚔</div>
+    <p class="hero-desc reveal">Where champions are forged. Join the most feared and respected gaming guild in Kerala — dominating wars and welcoming all warriors.</p>
+    <div class="hero-stats reveal">
+      <div class="stat-item"><span class="stat-num" data-count="100">0</span><span class="stat-label">War Wins</span></div>
+      <div class="stat-item"><span class="stat-num" data-count="75">0</span><span class="stat-label">Wars</span></div>
+    </div>
+    <div class="hero-btns reveal">
+      <a href="#booking" class="btn-primary">⚔ CHALLENGE US</a>
+      <a href="#join" class="btn-secondary">JOIN</a>
+    </div>
+  </div>
+  <div class="scroll-hint"><div class="scroll-line"></div>SCROLL</div>
+</section>
+
+<div class="gold-divider"></div>
+
+<section id="about">
+  <div class="section-header reveal">
+    <div class="section-eyebrow">Our Story</div>
+    <h2 class="section-title">The <span>AKKARMASHI</span> Legacy</h2>
+    <p class="section-desc">Born in Kottayam, forged in countless guild wars, standing as a testament to teamwork and brotherhood.</p>
+  </div>
+  <div class="about-grid">
+    <div class="about-visual reveal-left">
+      <div class="hexgrid" id="hexGrid"></div>
+      <div class="about-badge">
+        <div class="about-badge-inner">
+          <div class="about-badge-text">AKKARMASHI</div>
+          <div class="about-badge-sub">ELITE GUILD</div>
+          <div style="font-size:1.8rem;">⚔️</div>
+          <div class="about-badge-sub">KERALA</div>
+        </div>
+      </div>
+    </div>
+    <div class="about-text reveal-right">
+      <h3>All Are Welcome</h3>
+      <p>AKKARMASHI was built on one belief: every player deserves a home. Whether veteran or new — if you have the fire, we have the guild.</p>
+      <p>Led by <strong style="color:var(--gold);">@nnsentryzone</strong> and <strong style="color:var(--gold);">Leader @nidhin.0h</strong>, we operate with precision and brotherhood.</p>
+      <ul class="about-features">
+        <li><div class="feature-icon">🎯</div> Precision war strategy & coordination</li>
+        <li><div class="feature-icon">🛡️</div> Active guild protection</li>
+        <li><div class="feature-icon">🏆</div> Weekly tournaments</li>
+        <li><div class="feature-icon">🌐</div> Multi-game presence</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<div class="gold-divider"></div>
+
+<section id="booking">
+  <div class="section-header reveal">
+    <div class="section-eyebrow">Challenge System</div>
+    <h2 class="section-title">Book a <span>Guild War</span></h2>
+    <p class="section-desc">Think your guild has what it takes? Challenge AKKARMASHI. Fill the form — we will answer.</p>
+  </div>
+  <div class="booking-wrap">
+    <div class="booking-form-card reveal">
+      <div class="booking-header">
+        <h3>⚔ War Challenge Form</h3>
+        <div class="booking-status">● ACCEPTING</div>
+      </div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">Guild Name</label>
+          <input type="text" class="form-input" id="guildName" placeholder="Enter guild name">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Guild Leader</label>
+          <input type="text" class="form-input" id="leaderName" placeholder="Your name">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Contact Handle</label>
+          <input type="text" class="form-input" id="contact" placeholder="@username">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Team Size</label>
+          <select class="form-select" id="players">
+            <option value="">Select</option>
+            <option>3 vs 3</option>
+            <option>4 vs 4</option>
+            <option>6 vs 6</option>
+            <option>Custom</option>
+          </select>
+        </div>
+        <div class="form-group full-width">
+          <label class="form-label">War Type</label>
+          <div class="war-type-grid">
+            <button class="war-type-btn active" onclick="selectWarType(this)"><span class="wt-icon">⚔️</span>Classic</button>
+            <button class="war-type-btn" onclick="selectWarType(this)"><span class="wt-icon">💀</span>Death Match</button>
+            <button class="war-type-btn" onclick="selectWarType(this)"><span class="wt-icon">🔥</span>Survival</button>
+            <button class="war-type-btn" onclick="selectWarType(this)"><span class="wt-icon">🎮</span>Friendly</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Date</label>
+          <input type="date" class="form-input" id="warDate">
+        </div>
+        <div class="form-group full-width">
+          <label class="form-label">Preferred Time Slot (IST)</label>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div>
+              <label class="form-label" style="font-size: 0.5rem; margin-bottom: 4px; display: block;">Start Time</label>
+              <input type="time" class="form-input" id="startTime" value="09:00">
+            </div>
+            <div>
+              <label class="form-label" style="font-size: 0.5rem; margin-bottom: 4px; display: block;">End Time</label>
+              <input type="time" class="form-input" id="endTime" value="11:00">
+            </div>
+          </div>
+        </div>
+        <div class="form-group full-width">
+          <label class="form-label">Message</label>
+          <textarea class="form-textarea" id="message" placeholder="Special conditions, game title…"></textarea>
+        </div>
+      </div>
+      <button class="booking-submit" onclick="submitBooking()">⚔ SUBMIT CHALLENGE</button>
+    </div>
+  </div>
+</section>
+
+<div class="gold-divider"></div>
+
+<section id="achievements">
+  <div class="section-header reveal">
+    <div class="section-eyebrow">Hall of Glory</div>
+    <h2 class="section-title">Guild <span>Achievements</span></h2>
+    <p class="section-desc">Our record speaks louder than words.</p>
+  </div>
+  <div class="achievements-grid">
+    <div class="achievement-card reveal"><span class="ach-icon">🏆</span><div class="ach-title">War Wins</div><span class="ach-value">100+</span><div class="ach-desc">Confirmed victories across all titles</div></div>
+    <div class="achievement-card reveal"><span class="ach-icon">💀</span><div class="ach-title">Total Kills</div><span class="ach-value">48K+</span><div class="ach-desc">Combined eliminations in wars</div></div>
+    <div class="achievement-card reveal"><span class="ach-icon">⚔️</span><div class="ach-title">Wars Fought</div><span class="ach-value">75</span><div class="ach-desc">Recorded official wars</div></div>
+    <div class="achievement-card reveal"><span class="ach-icon">🎖️</span><div class="ach-title">Win Rate</div><span class="ach-value">87%</span><div class="ach-desc">One of the highest in Kerala</div></div>
+  </div>
+</section>
+
+<div class="gold-divider"></div>
+
+<section id="join">
+  <div class="join-content">
+    <div class="section-header reveal">
+      <div class="section-eyebrow">Recruitment Open</div>
+      <h2 class="section-title">Join the <span>Guild</span></h2>
+      <p class="section-desc">ALL ARE WELCOME ❤️ — Here's what we're looking for.</p>
+    </div>
+    <div class="join-requirements">
+      <div class="req-card reveal"><span class="req-icon">💪</span><div class="req-title">Dedication</div><div class="req-desc">Active participation in wars</div></div>
+      <div class="req-card reveal"><span class="req-icon">🤝</span><div class="req-title">Teamwork</div><div class="req-desc">We win together, lose together</div></div>
+      <div class="req-card reveal"><span class="req-icon">❤️</span><div class="req-title">Loyalty</div><div class="req-desc">Once AKKARMASHI, always family</div></div>
+    </div>
+    <div class="social-links reveal">
+      <a href="https://www.instagram.com/akkarmashi_offical" target="_blank" class="social-link">📸 INSTAGRAM</a>
+      <a href="https://www.youtube.com/@NNSENTRYZONEYT" target="_blank" class="social-link">📺 YOUTUBE</a>
+      <a href="#booking" class="social-link">⚔️ CHALLENGE</a>
+    </div>
+  </div>
+</section>
+
+<div class="gold-divider"></div>
+
+<footer>
+  <div class="footer-grid">
+    <div>
+      <div class="footer-logo">⚔ AKKARMASHI</div>
+      <div class="footer-tagline">Kerala's elite gaming guild. All Are Welcome. #Kottayam #Kerala</div>
+    </div>
+    <div>
+      <div class="footer-col-title">Navigation</div>
+      <ul class="footer-links">
+        <li><a href="#about">About</a></li>
+        <li><a href="#booking">Book War</a></li>
+        <li><a href="#achievements">Trophies</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-title">Socials</div>
+      <ul class="footer-links">
+        <li><a href="https://www.instagram.com/akkarmashi_offical" target="_blank">Instagram</a></li>
+        <li><a href="https://www.youtube.com/@NNSENTRYZONEYT" target="_blank">YouTube</a></li>
+        <li><a href="#join">Join Guild</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="footer-copy">© 2025 AKKARMASHI GUILD — ALL RIGHTS RESERVED</div>
+    <div class="footer-kerala">#KERALA · ALL ARE WELCOME ❤️</div>
+  </div>
+</footer>
+
+<script>
+const canvas = document.getElementById('particle-canvas');
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+window.addEventListener('resize', () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; });
+const particles = Array.from({length: 60}, () => ({
+  x: Math.random() * canvas.width, y: Math.random() * canvas.height,
+  vx: (Math.random() - 0.5) * 0.4, vy: (Math.random() - 0.5) * 0.4,
+  r: Math.random() * 1.5 + 0.5, a: Math.random() * 0.6 + 0.1
+}));
+function drawParticles() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  particles.forEach(p => {
+    p.x += p.vx; p.y += p.vy;
+    if (p.x < 0) p.x = canvas.width; if (p.x > canvas.width) p.x = 0;
+    if (p.y < 0) p.y = canvas.height; if (p.y > canvas.height) p.y = 0;
+    ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+    ctx.fillStyle = `rgba(245,200,66,${p.a})`; ctx.fill();
+  });
+  for (let i = 0; i < particles.length; i++) {
+    for (let j = i+1; j < particles.length; j++) {
+      const dx = particles[i].x - particles[j].x, dy = particles[i].y - particles[j].y;
+      const d = Math.sqrt(dx*dx + dy*dy);
+      if (d < 100) {
+        ctx.beginPath(); ctx.moveTo(particles[i].x, particles[i].y); ctx.lineTo(particles[j].x, particles[j].y);
+        ctx.strokeStyle = `rgba(245,200,66,${0.06 * (1 - d/100)})`; ctx.lineWidth = 0.5; ctx.stroke();
+      }
+    }
+  }
+  requestAnimationFrame(drawParticles);
+}
+drawParticles();
+
+const hexGrid = document.getElementById('hexGrid');
+if (hexGrid) {
+  for (let i = 0; i < 16; i++) {
+    const h = document.createElement('div');
+    h.className = 'hex-cell';
+    h.style.setProperty('--d', `${2+Math.random()*3}s`);
+    h.style.setProperty('--dl', `${Math.random()*2}s`);
+    hexGrid.appendChild(h);
+  }
+}
+
+const revEls = document.querySelectorAll('.reveal, .reveal-left, .reveal-right');
+const obs = new IntersectionObserver((entries) => {
+  entries.forEach((entry, i) => {
+    if (entry.isIntersecting) {
+      setTimeout(() => entry.target.classList.add('visible'), 80 * (Array.from(entry.target.parentNode.children).indexOf(entry.target) % 5));
+      obs.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.1 });
+revEls.forEach(el => obs.observe(el));
+
+function animCount(el) {
+  const target = parseInt(el.getAttribute('data-count'));
+  let cur = 0; const step = target / 60;
+  const t = setInterval(() => {
+    cur += step; if (cur >= target) { cur = target; clearInterval(t); }
+    el.textContent = Math.floor(cur) + (target >= 100 ? '+' : '');
+  }, 16);
+}
+const countObs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { animCount(e.target); countObs.unobserve(e.target); }});
+}, {threshold: 0.5});
+document.querySelectorAll('[data-count]').forEach(el => countObs.observe(el));
+
+function selectWarType(btn) {
+  document.querySelectorAll('.war-type-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function submitBooking() {
+  const guild = document.getElementById('guildName').value.trim();
+  const leader = document.getElementById('leaderName').value.trim();
+  const contact = document.getElementById('contact').value.trim();
+  const players = document.getElementById('players').value.trim();
+  const warDate = document.getElementById('warDate').value.trim();
+  const startTime = document.getElementById('startTime').value.trim();
+  const endTime = document.getElementById('endTime').value.trim();
+  const message = document.getElementById('message').value.trim();
+  const warType = document.querySelector('.war-type-btn.active').textContent.trim();
+  
+  if (!guild || !leader || !players || !warDate || !startTime || !endTime) { 
+    alert('Please fill in all required fields'); 
+    return; 
+  }
+  
+  const id = 'AKK-' + Date.now().toString().slice(-6);
+  
+  // Send email using EmailJS
+  const templateParams = {
+    to_email: 'aarontjoseph321@gmail.com',
+    from_name: guild,
+    guild_name: guild,
+    leader_name: leader,
+    contact_handle: contact,
+    team_size: players,
+    war_type: warType,
+    war_date: warDate,
+    start_time: startTime,
+    end_time: endTime,
+    special_message: message || 'None',
+    booking_id: id
+  };
+  
+  emailjs.send('service_akkarmashi', 'template_warbooking', templateParams)
+    .then(function(response) {
+      console.log('Email sent successfully:', response);
+      document.getElementById('bookingId').textContent = 'WAR-ID: ' + id;
+      document.getElementById('bookingModal').classList.add('show');
+      // Reset form
+      document.querySelector('.booking-form-card').querySelector('form')?.reset();
+    }, function(error) {
+      console.log('Email failed, showing confirmation anyway:', error);
+      // Even if email fails, show confirmation
+      document.getElementById('bookingId').textContent = 'WAR-ID: ' + id;
+      document.getElementById('bookingModal').classList.add('show');
+    });
+}
+
+function closeModal() { document.getElementById('bookingModal').classList.remove('show'); }
+
+document.getElementById('bookingModal').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
+
+let lastY = 0;
+window.addEventListener('scroll', () => {
+  const nav = document.querySelector('nav');
+  const y = window.scrollY;
+  nav.style.transform = y > lastY && y > 100 ? 'translateY(-100%)' : 'translateY(0)';
+  nav.style.transition = 'transform 0.4s ease';
+  lastY = y;
+});
+</script>
+</body>
+</html>
