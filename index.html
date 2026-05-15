@@ -89,6 +89,7 @@
     background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(245,200,66,0.08) 0%, transparent 60%),
                 radial-gradient(ellipse 50% 40% at 80% 80%, rgba(201,150,10,0.05) 0%, transparent 60%),
                 var(--bg-deep);
+    padding: 80px 20px 20px;
   }
 
   .hero-grid {
@@ -415,17 +416,6 @@
     color: var(--gold);
   }
   .war-type-btn .wt-icon { font-size: 1.2rem; display: block; margin-bottom: 4px; }
-  .time-slots { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 8px; }
-  .time-slot {
-    background: rgba(245,200,66,0.04); border: 1px solid rgba(245,200,66,0.15);
-    color: var(--text-body); padding: 8px 4px;
-    font-family: 'Orbitron', monospace; font-size: 0.5rem;
-    letter-spacing: 1px; cursor: pointer;
-    transition: all 0.3s; text-align: center;
-    font-weight: 600;
-  }
-  .time-slot.active { background: rgba(245,200,66,0.12); border-color: var(--gold); color: var(--gold); }
-  .time-slot.booked { opacity: 0.3; cursor: not-allowed; text-decoration: line-through; }
   .booking-submit {
     margin-top: 32px; width: 100%;
     font-family: 'Orbitron', monospace; font-size: 0.75rem;
@@ -443,7 +433,9 @@
   }
   .booking-submit:hover::before { left: 100%; }
   .booking-submit:hover { transform: translateY(-3px); box-shadow: 0 16px 40px rgba(245,200,66,0.5); }
+  .booking-submit:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
 
+  /* ── MODALS ── */
   .modal-overlay {
     position: fixed; inset: 0; background: rgba(0,0,0,0.9);
     z-index: 9000; display: none; align-items: center; justify-content: center;
@@ -484,6 +476,11 @@
     clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
   }
   .modal-close:hover { background: rgba(245,200,66,0.1); }
+
+  /* Success modal */
+  .modal-overlay.success-modal .modal-box { border-top-color: #5EFF5E; border-color: rgba(94,255,94,0.4); }
+  /* Error modal */
+  .modal-overlay.error-modal .modal-box { border-top-color: #FF5050; border-color: rgba(255,80,80,0.4); }
 
   #achievements {
     padding: 100px 60px;
@@ -582,12 +579,69 @@
   .reveal-right { opacity: 0; transform: translateX(40px); transition: opacity 0.8s ease, transform 0.8s ease; }
   .reveal-right.visible { opacity: 1; transform: translateX(0); }
 
+  /* Join Guild Form */
+  .join-form-card {
+    background: linear-gradient(135deg, rgba(15,15,24,0.9) 0%, rgba(10,10,15,0.9) 100%);
+    border: 1px solid rgba(245,200,66,0.2);
+    border-top: 2px solid var(--gold);
+    padding: 40px;
+    position: relative; overflow: hidden;
+    clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px));
+    max-width: 700px; margin: 40px auto;
+  }
+  .join-form-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0;
+    height: 1px; background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+  .join-form-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 32px; flex-wrap: wrap; gap: 16px;
+  }
+  .join-form-header h3 {
+    font-family: 'Cinzel Decorative', serif; font-size: 1.3rem;
+    color: var(--gold);
+  }
+  .join-status {
+    font-family: 'Orbitron', monospace; font-size: 0.5rem;
+    letter-spacing: 2px; padding: 6px 12px;
+    border: 1px solid rgba(245,200,66,0.3); color: var(--gold);
+    background: rgba(245,200,66,0.05);
+    clip-path: polygon(4px 0%, 100% 0%, calc(100% - 4px) 100%, 0% 100%);
+  }
+  .join-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .join-form-grid .full-width { grid-column: 1 / -1; }
+  .join-submit {
+    margin-top: 28px; width: 100%;
+    font-family: 'Orbitron', monospace; font-size: 0.7rem;
+    font-weight: 900; letter-spacing: 3px;
+    background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%);
+    color: #000; border: none; padding: 14px;
+    clip-path: polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%);
+    cursor: pointer; transition: all 0.3s; position: relative; overflow: hidden;
+  }
+  .join-submit::before {
+    content: ''; position: absolute; top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    transition: left 0.6s;
+  }
+  .join-submit:hover::before { left: 100%; }
+  .join-submit:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(245,200,66,0.45); }
+  .join-submit:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
   @media (max-width: 900px) {
     nav { padding: 14px 20px; }
     .nav-links { display: none; }
     .nav-logo { font-size: 1.1rem; }
     .nav-cta { font-size: 0.55rem; padding: 8px 16px; }
-    .hero-content { padding: 0 20px; }
+    #hero { padding: 80px 16px 20px; }
+    .hero-content { padding: 0 16px; max-width: 100%; }
+    .hero-title { font-size: clamp(2rem, 5vw, 3.5rem); }
+    .hero-desc { font-size: 0.9rem; max-width: 100%; }
+    .hero-stats { gap: 20px; flex-wrap: wrap; }
+    .stat-num { font-size: 1.4rem; }
+    .hero-btns { flex-direction: column; gap: 12px; }
+    .btn-primary, .btn-secondary { width: 100%; text-align: center; }
     .shield-container { display: none; }
     #about, #booking, #achievements, #join { padding: 80px 20px; }
     .about-grid { grid-template-columns: 1fr; gap: 40px; }
@@ -597,26 +651,53 @@
     .footer-grid { grid-template-columns: 1fr; gap: 24px; }
     .form-grid { grid-template-columns: 1fr; }
     .war-type-grid { grid-template-columns: repeat(2, 1fr); }
-    .time-slots { grid-template-columns: repeat(3, 1fr); }
     footer { padding: 40px 20px; }
   }
 </style>
-<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/index.min.js"></script>
-<script type="text/javascript">
-  emailjs.init("7b9h8k2jZqX9nL5mP"); // Initialize with a basic ID
-</script>
 </head>
 <body>
 
 <canvas id="particle-canvas"></canvas>
 
+<!-- WAR BOOKING CONFIRMATION MODAL -->
 <div class="modal-overlay" id="bookingModal">
   <div class="modal-box">
     <span class="modal-icon">⚔️</span>
     <div class="modal-title">WAR BOOKED!</div>
     <p class="modal-text">Your guild war challenge has been received. AKKARMASHI will confirm within 24 hours.</p>
     <div class="modal-id" id="bookingId">WAR-ID: AKK-000000</div>
-    <button class="modal-close" onclick="closeModal()">CLOSE</button>
+    <button class="modal-close" onclick="closeModal('bookingModal')">CLOSE</button>
+  </div>
+</div>
+
+<!-- JOIN APPLICATION CONFIRMATION MODAL -->
+<div class="modal-overlay" id="joinModal">
+  <div class="modal-box">
+    <span class="modal-icon">👑</span>
+    <div class="modal-title">APPLICATION SENT!</div>
+    <p class="modal-text">Your guild join application has been received. Our leadership will review and contact you within 48 hours.</p>
+    <div class="modal-id" id="joinId">APP-ID: AKK-000000</div>
+    <button class="modal-close" onclick="closeModal('joinModal')">CLOSE</button>
+  </div>
+</div>
+
+<!-- SUCCESS MODAL -->
+<div class="modal-overlay success-modal" id="successModal">
+  <div class="modal-box">
+    <span class="modal-icon" style="font-size:3.5rem;">✅</span>
+    <div class="modal-title" style="color:#5EFF5E;">MESSAGE SENT!</div>
+    <p class="modal-text" id="successText">Your data has been sent successfully. You will receive a response shortly.</p>
+    <button class="modal-close" onclick="closeModal('successModal')" style="border-color:#5EFF5E;color:#5EFF5E;">OK</button>
+  </div>
+</div>
+
+<!-- ERROR MODAL -->
+<div class="modal-overlay error-modal" id="errorModal">
+  <div class="modal-box">
+    <span class="modal-icon" style="font-size:3.5rem; color:#FF5050;">✕</span>
+    <div class="modal-title" style="color:#FF5050;">SEND FAILED</div>
+    <p class="modal-text" id="errorText">There was an error. Please try again.</p>
+    <button class="modal-close" onclick="closeModal('errorModal')" style="border-color:#FF5050;color:#FF5050;">TRY AGAIN</button>
   </div>
 </div>
 
@@ -730,6 +811,8 @@
         <h3>⚔ War Challenge Form</h3>
         <div class="booking-status">● ACCEPTING</div>
       </div>
+
+
       <div class="form-grid">
         <div class="form-group">
           <label class="form-label">Guild Name</label>
@@ -784,7 +867,7 @@
           <textarea class="form-textarea" id="message" placeholder="Special conditions, game title…"></textarea>
         </div>
       </div>
-      <button class="booking-submit" onclick="submitBooking()">⚔ SUBMIT CHALLENGE</button>
+      <button class="booking-submit" id="warSubmitBtn" onclick="submitBooking()">⚔ SUBMIT CHALLENGE</button>
     </div>
   </div>
 </section>
@@ -821,8 +904,39 @@
     </div>
     <div class="social-links reveal">
       <a href="https://www.instagram.com/akkarmashi_offical" target="_blank" class="social-link">📸 INSTAGRAM</a>
-      <a href="https://www.youtube.com/@NNSENTRYZONEYT" target="_blank" class="social-link">📺 YOUTUBE</a>
+      <a href="https://www.youtube.com/@UCgDRcp_PpdN6NLL1bFUd_PA" target="_blank" class="social-link">📺 YOUTUBE</a>
       <a href="#booking" class="social-link">⚔️ CHALLENGE</a>
+    </div>
+
+    <!-- Guild Join Form -->
+    <div class="join-form-card reveal">
+      <div class="join-form-header">
+        <h3>⚔ Guild Join Application</h3>
+        <div class="join-status">● OPEN FOR RECRUITMENT</div>
+      </div>
+      <div class="join-form-grid">
+        <div class="form-group">
+          <label class="form-label">Player Name (IGN)</label>
+          <input type="text" class="form-input" id="playerName" placeholder="Your in-game name">
+        </div>
+        <div class="form-group">
+          <label class="form-label">UID / Player ID</label>
+          <input type="text" class="form-input" id="playerUID" placeholder="Your unique player ID">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Instagram Handle</label>
+          <input type="text" class="form-input" id="instaHandle" placeholder="@yourusername">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Level / Rank</label>
+          <input type="number" class="form-input" id="playerLevel" placeholder="Your current level">
+        </div>
+        <div class="form-group full-width">
+          <label class="form-label">Additional Info</label>
+          <textarea class="form-textarea" id="joinMessage" placeholder="Tell us about yourself, gaming experience, games you play..."></textarea>
+        </div>
+      </div>
+      <button class="join-submit" id="joinSubmitBtn" onclick="submitJoinApplication()">⚔ APPLY TO JOIN</button>
     </div>
   </div>
 </section>
@@ -847,7 +961,7 @@
       <div class="footer-col-title">Socials</div>
       <ul class="footer-links">
         <li><a href="https://www.instagram.com/akkarmashi_offical" target="_blank">Instagram</a></li>
-        <li><a href="https://www.youtube.com/@NNSENTRYZONEYT" target="_blank">YouTube</a></li>
+        <li><a href="https://www.youtube.com/@UCgDRcp_PpdN6NLL1bFUd_PA" target="_blank">YouTube</a></li>
         <li><a href="#join">Join Guild</a></li>
       </ul>
     </div>
@@ -859,6 +973,14 @@
 </footer>
 
 <script>
+// ═══════════════════════════════════════════════════
+//  FORMSPREE IDs — REPLACE THESE WITH YOUR OWN IDs
+//  Get free IDs at https://formspree.io
+// ═══════════════════════════════════════════════════
+const WAR_FORM_ID  = 'xrejwjwj';   // e.g. 'xbjnkwpz'
+const JOIN_FORM_ID = 'mzdolone';  // e.g. 'xpzgnkwb'
+
+// ── Particles ──────────────────────────────────────
 const canvas = document.getElementById('particle-canvas');
 const ctx = canvas.getContext('2d');
 canvas.width = window.innerWidth; canvas.height = window.innerHeight;
@@ -891,6 +1013,7 @@ function drawParticles() {
 }
 drawParticles();
 
+// ── Hex Grid ───────────────────────────────────────
 const hexGrid = document.getElementById('hexGrid');
 if (hexGrid) {
   for (let i = 0; i < 16; i++) {
@@ -902,9 +1025,10 @@ if (hexGrid) {
   }
 }
 
+// ── Scroll reveal ──────────────────────────────────
 const revEls = document.querySelectorAll('.reveal, .reveal-left, .reveal-right');
 const obs = new IntersectionObserver((entries) => {
-  entries.forEach((entry, i) => {
+  entries.forEach((entry) => {
     if (entry.isIntersecting) {
       setTimeout(() => entry.target.classList.add('visible'), 80 * (Array.from(entry.target.parentNode.children).indexOf(entry.target) % 5));
       obs.unobserve(entry.target);
@@ -913,6 +1037,7 @@ const obs = new IntersectionObserver((entries) => {
 }, { threshold: 0.1 });
 revEls.forEach(el => obs.observe(el));
 
+// ── Counter animation ──────────────────────────────
 function animCount(el) {
   const target = parseInt(el.getAttribute('data-count'));
   let cur = 0; const step = target / 60;
@@ -926,64 +1051,166 @@ const countObs = new IntersectionObserver(entries => {
 }, {threshold: 0.5});
 document.querySelectorAll('[data-count]').forEach(el => countObs.observe(el));
 
+// ── War type selector ──────────────────────────────
 function selectWarType(btn) {
   document.querySelectorAll('.war-type-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
 }
 
-function submitBooking() {
-  const guild = document.getElementById('guildName').value.trim();
-  const leader = document.getElementById('leaderName').value.trim();
-  const contact = document.getElementById('contact').value.trim();
-  const players = document.getElementById('players').value.trim();
-  const warDate = document.getElementById('warDate').value.trim();
-  const startTime = document.getElementById('startTime').value.trim();
-  const endTime = document.getElementById('endTime').value.trim();
-  const message = document.getElementById('message').value.trim();
-  const warType = document.querySelector('.war-type-btn.active').textContent.trim();
-  
-  if (!guild || !leader || !players || !warDate || !startTime || !endTime) { 
-    alert('Please fill in all required fields'); 
-    return; 
-  }
-  
-  const id = 'AKK-' + Date.now().toString().slice(-6);
-  
-  // Send email using EmailJS
-  const templateParams = {
-    to_email: 'aarontjoseph321@gmail.com',
-    from_name: guild,
-    guild_name: guild,
-    leader_name: leader,
-    contact_handle: contact,
-    team_size: players,
-    war_type: warType,
-    war_date: warDate,
-    start_time: startTime,
-    end_time: endTime,
-    special_message: message || 'None',
-    booking_id: id
-  };
-  
-  emailjs.send('service_akkarmashi', 'template_warbooking', templateParams)
-    .then(function(response) {
-      console.log('Email sent successfully:', response);
-      document.getElementById('bookingId').textContent = 'WAR-ID: ' + id;
-      document.getElementById('bookingModal').classList.add('show');
-      // Reset form
-      document.querySelector('.booking-form-card').querySelector('form')?.reset();
-    }, function(error) {
-      console.log('Email failed, showing confirmation anyway:', error);
-      // Even if email fails, show confirmation
-      document.getElementById('bookingId').textContent = 'WAR-ID: ' + id;
-      document.getElementById('bookingModal').classList.add('show');
-    });
+// ── Modal helpers ──────────────────────────────────
+function showModal(id) { document.getElementById(id).classList.add('show'); }
+function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+// Close on backdrop click
+['bookingModal','joinModal','successModal','errorModal'].forEach(id => {
+  document.getElementById(id).addEventListener('click', function(e) {
+    if (e.target === this) closeModal(id);
+  });
+});
+
+// ── Formspree helper ────────────────────────────────
+async function sendToFormspree(formId, data) {
+  const response = await fetch(`https://formspree.io/f/${formId}`, {
+    method: 'POST',
+    headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  });
+  return response.json();
 }
 
-function closeModal() { document.getElementById('bookingModal').classList.remove('show'); }
+// ── WAR BOOKING SUBMIT ─────────────────────────────
+async function submitBooking() {
+  const guild    = document.getElementById('guildName').value.trim();
+  const leader   = document.getElementById('leaderName').value.trim();
+  const contact  = document.getElementById('contact').value.trim();
+  const players  = document.getElementById('players').value.trim();
+  const warDate  = document.getElementById('warDate').value.trim();
+  const startTime= document.getElementById('startTime').value.trim();
+  const endTime  = document.getElementById('endTime').value.trim();
+  const message  = document.getElementById('message').value.trim();
+  const warType  = document.querySelector('.war-type-btn.active')?.textContent.trim() || 'Classic';
 
-document.getElementById('bookingModal').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
+  if (!guild || !leader || !players || !warDate || !startTime || !endTime) {
+    alert('Please fill in all required fields');
+    return;
+  }
 
+  if (WAR_FORM_ID === 'YOUR_WAR_FORM_ID') {
+    alert('⚠️ Please set up your Formspree ID first!\nSee the yellow notice at the top of the booking form.');
+    return;
+  }
+
+  const btn = document.getElementById('warSubmitBtn');
+  btn.textContent = '⏳ SENDING...';
+  btn.disabled = true;
+
+  const id = 'AKK-' + Date.now().toString().slice(-6);
+
+  try {
+    const result = await sendToFormspree(WAR_FORM_ID, {
+      subject: `⚔️ New War Challenge from ${guild} — ${id}`,
+      'Guild Name': guild,
+      'Guild Leader': leader,
+      'Contact Handle': contact,
+      'Team Size': players,
+      'War Type': warType,
+      'War Date': warDate,
+      'Start Time (IST)': startTime,
+      'End Time (IST)': endTime,
+      'Message': message || 'None',
+      'Booking ID': id
+    });
+
+    if (result.ok) {
+      // Show success → then booking confirmation
+      document.getElementById('successText').textContent =
+        `War challenge sent to Akkarmashi@gmail.com ✓`;
+      showModal('successModal');
+
+      setTimeout(() => {
+        closeModal('successModal');
+        document.getElementById('bookingId').textContent = 'WAR-ID: ' + id;
+        showModal('bookingModal');
+        // Reset form
+        ['guildName','leaderName','contact','message'].forEach(id => document.getElementById(id).value = '');
+        document.getElementById('players').value = '';
+        document.getElementById('warDate').value = '';
+        document.getElementById('startTime').value = '09:00';
+        document.getElementById('endTime').value = '11:00';
+      }, 1800);
+    } else {
+      throw new Error(result.errors?.[0]?.message || 'Formspree rejected the submission');
+    }
+  } catch (err) {
+    document.getElementById('errorText').textContent =
+      'Failed to send war challenge: ' + err.message + '. Please try again.';
+    showModal('errorModal');
+  } finally {
+    btn.textContent = '⚔ SUBMIT CHALLENGE';
+    btn.disabled = false;
+  }
+}
+
+// ── JOIN APPLICATION SUBMIT ────────────────────────
+async function submitJoinApplication() {
+  const playerName  = document.getElementById('playerName').value.trim();
+  const playerUID   = document.getElementById('playerUID').value.trim();
+  const instaHandle = document.getElementById('instaHandle').value.trim();
+  const playerLevel = document.getElementById('playerLevel').value.trim();
+  const joinMessage = document.getElementById('joinMessage').value.trim();
+
+  if (!playerName || !playerUID || !instaHandle || !playerLevel) {
+    alert('Please fill in all required fields');
+    return;
+  }
+
+  if (JOIN_FORM_ID === 'YOUR_JOIN_FORM_ID') {
+    alert('⚠️ Please set up your Formspree Join Form ID first!\nSee the yellow notice in the booking section.');
+    return;
+  }
+
+  const btn = document.getElementById('joinSubmitBtn');
+  btn.textContent = '⏳ SUBMITTING...';
+  btn.disabled = true;
+
+  const id = 'AKK-' + Date.now().toString().slice(-6);
+
+  try {
+    const result = await sendToFormspree(JOIN_FORM_ID, {
+      subject: `👑 New Guild Application from ${playerName} — ${id}`,
+      'Player Name (IGN)': playerName,
+      'UID / Player ID': playerUID,
+      'Instagram Handle': instaHandle,
+      'Level / Rank': playerLevel,
+      'Additional Info': joinMessage || 'None',
+      'Application ID': id
+    });
+
+    if (result.ok) {
+      document.getElementById('successText').textContent =
+        `Guild application sent to karthik2448483@gmail.com ✓`;
+      showModal('successModal');
+
+      setTimeout(() => {
+        closeModal('successModal');
+        document.getElementById('joinId').textContent = 'APP-ID: ' + id;
+        showModal('joinModal');
+        // Reset form
+        ['playerName','playerUID','instaHandle','playerLevel','joinMessage'].forEach(id => document.getElementById(id).value = '');
+      }, 1800);
+    } else {
+      throw new Error(result.errors?.[0]?.message || 'Formspree rejected the submission');
+    }
+  } catch (err) {
+    document.getElementById('errorText').textContent =
+      'Failed to send application: ' + err.message + '. Please try again.';
+    showModal('errorModal');
+  } finally {
+    btn.textContent = '⚔ APPLY TO JOIN';
+    btn.disabled = false;
+  }
+}
+
+// ── Nav hide on scroll down ────────────────────────
 let lastY = 0;
 window.addEventListener('scroll', () => {
   const nav = document.querySelector('nav');
